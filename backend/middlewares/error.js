@@ -27,9 +27,12 @@ const errorMiddleware = (error, req, res, next) => {
     error = new ErrorHandler(message, 400);
   }
 
+  console.log(error, "=============error");
+
   return res.status(error.statusCode).json({
     success: false,
     message: error.message,
+    error: error,
   });
 };
 

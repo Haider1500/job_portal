@@ -13,15 +13,12 @@ const register = catchAsyncErrors(async (req, res, next) => {
       role,
       email,
       coverLetter,
-      firstNiche,
-      secondNiche,
-      thirdNiche,
+      niches: { firstNiche, secondNiche, thirdNiche },
     } = req.body;
     if (!name || !phone || !password || !address || !role || !email) {
       return next(new ErrorHandler("All fields are required", 400));
     }
-
-    if (role === "Job Seeker" && !firstNiche && !secondNiche && !thirdNiche) {
+    if ((role === "Job Seeker" && !firstNiche) || !secondNiche || !thirdNiche) {
       return next(new ErrorHandler("Job niches are required", 400));
     }
 
