@@ -13,7 +13,7 @@ const register = catchAsyncErrors(async (req, res, next) => {
       role,
       email,
       coverLetter,
-      niches: { firstNiche, secondNiche, thirdNiche },
+      niches: { firstNiche, secondNiche, thirdNiche } = {},
     } = req.body;
     if (!name || !phone || !password || !address || !role || !email) {
       return next(new ErrorHandler("All fields are required", 400));
@@ -70,4 +70,20 @@ const register = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
-module.exports = register;
+const login = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const { email, password } = req.query;
+    if ((!email, !password)) {
+      return next(new ErrorHandler("all fields are required", 400));
+    }
+    // check if user exists in the db
+    const isUser = await User.findOne({ email, password });
+    if (!isUser) {
+      return next(ErrorHandler("User doesnot exists", 400));
+    }
+
+    // create a web token if it exists
+  } catch (error) {}
+});
+
+module.exports = { register, login };
