@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     minLength: [8, "Password must contain atleast 8 characters"],
-    maxLength: [32, "Password must not exceed 32 characters"],
+    // maxLength: [32, "Password must not exceed 32 characters"],
   },
   phone: {
     type: Number,
@@ -42,7 +42,7 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     required: true,
-    enum: ["Job Seeker,Employer"],
+    enum: ["Job Seeker", "Employer"],
   },
   createdAt: {
     type: Date,

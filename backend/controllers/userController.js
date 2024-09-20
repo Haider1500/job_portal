@@ -2,6 +2,7 @@ const { ErrorHandler } = require("../middlewares/error");
 const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 const User = require("../models/userSchema");
 const { v2: cloudinary } = require("cloudinary");
+const bcrypt = require("bcrypt");
 
 const register = catchAsyncErrors(async (req, res, next) => {
   try {
@@ -15,10 +16,11 @@ const register = catchAsyncErrors(async (req, res, next) => {
       coverLetter,
       niches: { firstNiche, secondNiche, thirdNiche } = {},
     } = req.body;
+    console.log(req.body);
     if (!name || !phone || !password || !address || !role || !email) {
       return next(new ErrorHandler("All fields are required", 400));
     }
-    if ((role === "Job Seeker" && !firstNiche) || !secondNiche || !thirdNiche) {
+    if (role === "Job Seeker" && (!firstNiche || !secondNiche || !thirdNiche)) {
       return next(new ErrorHandler("Job niches are required", 400));
     }
 
@@ -27,10 +29,12 @@ const register = catchAsyncErrors(async (req, res, next) => {
       return next(new ErrorHandler("Email already registered", 400));
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10); //hashing the password
+
     const userData = {
       name,
       phone,
-      password,
+      password: hashedPassword,
       address,
       role,
       email,
@@ -39,6 +43,8 @@ const register = catchAsyncErrors(async (req, res, next) => {
     };
     if (req.files && req.files.resume) {
       const { resume } = req.files;
+
+      // uploading the resume
       try {
         const cloudinaryResponse = await cloudinary.uploader.upload(
           resume.tempFilePath,
@@ -70,20 +76,4 @@ const register = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
-const login = catchAsyncErrors(async (req, res, next) => {
-  try {
-    const { email, password } = req.query;
-    if ((!email, !password)) {
-      return next(new ErrorHandler("all fields are required", 400));
-    }
-    // check if user exists in the db
-    const isUser = await User.findOne({ email, password });
-    if (!isUser) {
-      return next(ErrorHandler("User doesnot exists", 400));
-    }
-
-    // create a web token if it exists
-  } catch (error) {}
-});
-
-module.exports = { register, login };
+module.exports = { register };
